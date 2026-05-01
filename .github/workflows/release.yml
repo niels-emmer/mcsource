@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build DMG
+        run: ./scripts/bundle.sh
+
+      - name: Build release notes
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+
+          # Tag annotation is the TLDR written by the release script
+          TLDR=$(git tag -l --format='%(contents)' "$TAG" | sed '/^$/d' | head -20)
+
+          # Commits since the previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            COMMITS=$(git log "${PREV_TAG}..${TAG}" --pretty=format:"- %s (%h)" 2>/dev/null)
+          else
+            COMMITS=$(git log --pretty=format:"- %s (%h)")
+          fi
+
+          {
+            if [ -n "$TLDR" ]; then
+              echo "$TLDR"
+              echo ""
+            fi
+            echo "## What's changed"
+            echo ""
+            echo "$COMMITS"
+            echo ""
+            if [ -n "$PREV_TAG" ]; then
+              echo "**Full diff:** [\`${PREV_TAG}...${TAG}\`](https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${TAG})"
+            fi
+          } > release-notes.md
+
+          echo "--- release-notes.md ---"
+          cat release-notes.md
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          gh release create "$TAG" \
+            --title "mcsource ${TAG}" \
+            --notes-file release-notes.md \
+            "dist/McSource-${VERSION}.dmg#McSource ${VERSION} — macOS arm64"
