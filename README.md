@@ -6,6 +6,8 @@ The icon in your menu bar reflects your currently active output. Click it to see
 
 > **Disclosure:** This application was designed and built entirely through prompting [Claude](https://claude.ai) (Anthropic). No code was written by hand. Unit tests and a protocol-based mock layer serve as the primary guardrail to verify that the audio-switching logic, configuration persistence, and icon-mapping behaviour are correct. See [Testing](#testing) for details.
 
+> **Trust & safety:** mcsource makes no network requests and touches nothing outside CoreAudio and its own preferences. Read [Safety & trust](docs/security.md) for a full breakdown of what the app does on your system, what Apple's Gatekeeper warning actually means, and how to run entirely from source if you prefer.
+
 ---
 
 ## Requirements
@@ -27,7 +29,7 @@ The icon in your menu bar reflects your currently active output. Click it to see
    ```
 6. Open McSource from Launchpad or Spotlight — the speaker icon appears in your menu bar
 
-> **Why step 5?** macOS quarantines apps downloaded from the internet. Because mcsource is not signed with a paid Apple Developer certificate, Gatekeeper will otherwise block it with _"Apple could not verify this app is free of malware"_. The `xattr` command removes the quarantine flag. Alternatively, after the first blocked attempt, go to System Settings → Privacy & Security → scroll down → **Open Anyway**.
+> **Why step 5?** macOS quarantines apps downloaded from the internet that lack an Apple Developer certificate. The `xattr` command removes that flag. Alternatively, after the first blocked attempt, go to System Settings → Privacy & Security → **Open Anyway**. See [Safety & trust](docs/security.md) for a full explanation of what the warning means, what mcsource does on your system, and how to run from source instead.
 
 To launch automatically at login: open McSource → click the menu bar icon → **Settings…** → enable **Launch at login**.
 
@@ -153,11 +155,11 @@ defaults read com.nielsemmer.mcsource
 ```
 
 **"Apple could not verify mcsource is free of malware"**  
-This is expected for apps not distributed via the App Store or signed with a paid Apple Developer certificate. Fix it with one Terminal command after dragging to Applications:
+Expected for apps without an Apple Developer certificate — it is an identity warning, not a finding. See [Safety & trust](docs/security.md) for a full explanation. Quick fix:
 ```bash
 xattr -dr com.apple.quarantine /Applications/McSource.app
 ```
-Alternatively: System Settings → Privacy & Security → scroll down → **Open Anyway**.
+Or: System Settings → Privacy & Security → **Open Anyway**. Prefer to skip the binary entirely? [Run from source](docs/security.md#run-from-source-no-binary-trust-required) in three commands.
 
 ---
 
