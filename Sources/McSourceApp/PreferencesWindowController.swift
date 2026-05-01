@@ -64,48 +64,41 @@ struct PreferencesView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
-                ForEach(devices) { device in
-                    DeviceRow(
-                        device: device,
-                        config: configBinding(for: device)
-                    )
-                    .padding(.vertical, 2)
+                Section("Outputs") {
+                    ForEach(devices) { device in
+                        DeviceRow(
+                            device: device,
+                            config: configBinding(for: device)
+                        )
+                        .padding(.vertical, 2)
+                    }
                 }
-            }
-            .listStyle(.inset)
 
-            Divider()
-
-            // Launch at login
-            VStack(spacing: 4) {
-                HStack {
+                Section("General") {
                     Toggle("Launch at login", isOn: $launchAtLogin)
                         .onChange(of: launchAtLogin) { newValue in
                             LoginItemManager.shared.setEnabled(newValue)
                             launchAtLogin = LoginItemManager.shared.isEnabled
                             loginItemNeedsApproval = LoginItemManager.shared.requiresApproval
                         }
-                    Spacer()
-                }
 
-                if loginItemNeedsApproval {
-                    HStack {
-                        Text("Approval required — enable in System Settings \u{203A} General \u{203A} Login Items.")
+                    if loginItemNeedsApproval {
+                        HStack {
+                            Text("Approval required — open System Settings \u{203A} General \u{203A} Login Items")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Button("Open\u{2026}") {
+                                SMAppService.openSystemSettingsLoginItems()
+                            }
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Open") {
-                            SMAppService.openSystemSettingsLoginItems()
                         }
-                        .font(.caption)
                     }
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.top, 8)
+            .listStyle(.inset)
 
             Divider()
-                .padding(.top, 6)
 
             HStack {
                 Text("\(devices.count) output\(devices.count == 1 ? "" : "s") detected")
