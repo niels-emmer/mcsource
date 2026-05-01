@@ -78,6 +78,36 @@ public final class CoreAudioProvider: AudioDeviceProviding {
         guard status == kAudioHardwareNoError else { throw CoreAudioError(status) }
     }
 
+    // MARK: - Volume
+
+    public func getVolume(for deviceID: AudioObjectID) -> Float? {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyVolumeScalar,
+            mScope:    kAudioObjectPropertyScopeOutput,
+            mElement:  kAudioObjectPropertyElementMain
+        )
+        guard AudioObjectHasProperty(deviceID, &address) else { return nil }
+        var volume: Float32 = 0
+        var size = UInt32(MemoryLayout<Float32>.size)
+        let status = AudioObjectGetPropertyData(deviceID, &address, 0, nil, &size, &volume)
+        return status == kAudioHardwareNoError ? volume : nil
+    }
+
+    public func setVolume(_ volume: Float, for deviceID: AudioObjectID) {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyVolumeScalar,
+            mScope:    kAudioObjectPropertyScopeOutput,
+            mElement:  kAudioObjectPropertyElementMain
+        )
+        guard AudioObjectHasProperty(deviceID, &address) else { return }
+        var isSettable: DarwinBoolean = false
+        AudioObjectIsPropertySettable(deviceID, &address, &isSettable)
+        guard isSettable.boolValue else { return }
+        var vol = Float32(volume)
+        let size = UInt32(MemoryLayout<Float32>.size)
+        AudioObjectSetPropertyData(deviceID, &address, 0, nil, size, &vol)
+    }
+
     // MARK: - Change observation
 
     public func observeChanges(handler: @escaping () -> Void) -> AnyObject {

@@ -35,4 +35,9 @@ public final class ConfigurationStore {
         save(all)
         NotificationCenter.default.post(name: ConfigurationStore.didChange, object: nil)
     }
+
+    /// UIDs of the (up to 2) devices marked as quick-switch pair.
+    public var pairDeviceUIDs: [String] {
+        loadAll().compactMap { $0.value.isInPair ? $0.key : nil }
+    }
 }

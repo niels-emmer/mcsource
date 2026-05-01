@@ -22,6 +22,7 @@ let package = Package(
                 .linkedFramework("AppKit"),
                 .linkedFramework("CoreAudio"),
                 .linkedFramework("ServiceManagement"),
+                .linkedFramework("Carbon"),
             ]
         ),
         .testTarget(

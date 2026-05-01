@@ -9,10 +9,10 @@ final class PreferencesWindowController: NSWindowController, NSWindowDelegate {
 
     init(provider: any AudioDeviceProviding, store: ConfigurationStore) {
         self.provider = provider
-        self.store = store
+        self.store    = store
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 460),
             styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -61,17 +61,35 @@ struct PreferencesView: View {
     @State private var launchAtLogin: Bool = LoginItemManager.shared.isEnabled
     @State private var loginItemNeedsApproval: Bool = LoginItemManager.shared.requiresApproval
 
+    private var pairCount: Int {
+        configurations.values.filter { $0.isInPair }.count
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             List {
-                Section("Outputs") {
+                Section {
                     ForEach(devices) { device in
                         DeviceRow(
                             device: device,
-                            config: configBinding(for: device)
+                            config: configBinding(for: device),
+                            pairCount: pairCount
                         )
                         .padding(.vertical, 2)
                     }
+                } header: {
+                    HStack(spacing: 0) {
+                        Text("Show")
+                            .frame(width: 42, alignment: .center)
+                        Text("Pair")
+                            .frame(width: 42, alignment: .center)
+                        Text("Device")
+                            .padding(.leading, 4)
+                        Spacer()
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textCase(nil)
                 }
 
                 Section("General") {
@@ -94,6 +112,12 @@ struct PreferencesView: View {
                             .font(.caption)
                         }
                     }
+                }
+
+                Section("Shortcuts") {
+                    ShortcutRow(label: "Open menu", shortcut: "⌥⇧M")
+                    ShortcutRow(label: "Switch pair", shortcut: "⌥⇧P",
+                                note: pairCount == 2 ? nil : "Select 2 devices in Pair to enable")
                 }
             }
             .listStyle(.inset)
@@ -155,19 +179,31 @@ struct PreferencesView: View {
     }
 }
 
+// MARK: - DeviceRow
+
 struct DeviceRow: View {
     let device: AudioDevice
     @Binding var config: DeviceConfiguration
+    let pairCount: Int
+
+    private var pairDisabled: Bool { pairCount >= 2 && !config.isInPair }
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 0) {
             Toggle("", isOn: $config.isEnabled)
                 .labelsHidden()
-                .frame(width: 36)
+                .frame(width: 42)
+
+            Toggle("", isOn: $config.isInPair)
+                .labelsHidden()
+                .frame(width: 42)
+                .disabled(pairDisabled)
+                .opacity(pairDisabled ? 0.35 : 1.0)
 
             Image(systemName: resolvedSymbol)
                 .frame(width: 22)
                 .foregroundStyle(config.isEnabled ? .primary : .secondary)
+                .padding(.leading, 4)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(device.name)
@@ -177,14 +213,13 @@ struct DeviceRow: View {
                     .font(.caption)
                     .textFieldStyle(.roundedBorder)
             }
+            .padding(.leading, 8)
 
             Spacer()
 
             Picker("", selection: $config.sfSymbol) {
                 ForEach(availableSymbols, id: \.self) { sym in
-                    Image(systemName: sym)
-                        .help(sym)
-                        .tag(sym)
+                    Image(systemName: sym).help(sym).tag(sym)
                 }
             }
             .pickerStyle(.menu)
@@ -195,5 +230,30 @@ struct DeviceRow: View {
 
     private var resolvedSymbol: String {
         config.sfSymbol.isEmpty ? device.transportType.defaultSFSymbol : config.sfSymbol
+    }
+}
+
+// MARK: - ShortcutRow
+
+private struct ShortcutRow: View {
+    let label: String
+    let shortcut: String
+    var note: String? = nil
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                if let note {
+                    Text(note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            Text(shortcut)
+                .font(.system(.body, design: .monospaced))
+                .foregroundStyle(.secondary)
+        }
     }
 }

@@ -26,7 +26,18 @@ public final class MockAudioProvider: AudioDeviceProviding {
     }
 
     public func observeChanges(handler: @escaping () -> Void) -> AnyObject {
-        // No-op token for tests; caller can store and release as needed.
         return NSObject()
+    }
+
+    // MARK: - Volume
+
+    public var volumeStore: [AudioObjectID: Float] = [:]
+
+    public func getVolume(for deviceID: AudioObjectID) -> Float? {
+        return volumeStore[deviceID]
+    }
+
+    public func setVolume(_ volume: Float, for deviceID: AudioObjectID) {
+        volumeStore[deviceID] = volume
     }
 }
