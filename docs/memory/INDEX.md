@@ -1,6 +1,6 @@
-# mcsource — agent memory
+# McAudio — agent memory
 
-> Always read this file at the start of a mcsource session.
+> Always read this file at the start of a McAudio session.
 
 ## What it is
 
@@ -13,7 +13,7 @@ macOS menu bar utility (NSStatusItem) for one-click audio output switching. No D
 - SwiftUI: preferences window only (NSHostingView inside NSWindowController)
 - CoreAudio C API: device enumeration and default-output switching
 - ServiceManagement: `SMAppService.mainApp` for launch-at-login
-- UserDefaults: config persistence key `com.mcsource.deviceConfigurations`
+- UserDefaults: config persistence key `com.mcaudio.deviceConfigurations`
 - No third-party dependencies
 
 ## Targets
@@ -21,7 +21,7 @@ macOS menu bar utility (NSStatusItem) for one-click audio output switching. No D
 | Target | Type | Purpose |
 |---|---|---|
 | `AudioCore` | Library | CoreAudio wrapper, models, config store — fully testable with mock |
-| `McSourceApp` | Executable | AppKit entry point, menu bar, preferences window |
+| `McAudioApp` | Executable | AppKit entry point, menu bar, preferences window |
 | `AudioCoreTests` | Test | 25 XCTest unit tests |
 
 ## Key files
@@ -32,10 +32,10 @@ macOS menu bar utility (NSStatusItem) for one-click audio output switching. No D
 | `Sources/AudioCore/CoreAudioProvider.swift` | Real HAL impl + ChangeToken HAL listener |
 | `Sources/AudioCore/MockAudioProvider.swift` | Injectable mock for unit tests |
 | `Sources/AudioCore/ConfigurationStore.swift` | UserDefaults encode/decode; posts `configurationsDidChange` on write |
-| `Sources/McSourceApp/StatusBarController.swift` | NSMenuDelegate + NotificationCenter observer; rebuilds on open and config change |
-| `Sources/McSourceApp/PreferencesWindowController.swift` | Settings window: device list, launch-at-login toggle, version badge with GitHub link |
-| `Sources/McSourceApp/LoginItemManager.swift` | `SMAppService.mainApp` wrapper for launch-at-login |
-| `scripts/bundle.sh` | Builds `dist/McSource.app` + `dist/McSource-{VERSION}.dmg` (drag-to-Applications layout) |
+| `Sources/McAudioApp/StatusBarController.swift` | NSMenuDelegate + NotificationCenter observer; rebuilds on open and config change |
+| `Sources/McAudioApp/PreferencesWindowController.swift` | Settings window: device list, launch-at-login toggle, version badge with GitHub link |
+| `Sources/McAudioApp/LoginItemManager.swift` | `SMAppService.mainApp` wrapper for launch-at-login |
+| `scripts/bundle.sh` | Builds `dist/McAudio.app` + `dist/McAudio-{VERSION}.dmg` (drag-to-Applications layout) |
 | `scripts/release.sh` | Bumps version in Info.plist, commits, creates annotated tag, pushes |
 | `.claude/hooks/session-complete.sh` | UserPromptSubmit hook: injects git context when "session complete" is prompted |
 | `.github/workflows/release.yml` | GitHub Actions: builds DMG on tag push, creates GitHub release with DMG artifact |
@@ -63,18 +63,18 @@ Use **major** only for breaking changes (e.g. dropped macOS version support, inc
 
 ```bash
 swift test                              # 25 unit tests
-swift run McSource                      # dev run (no bundle)
+swift run McAudio                      # dev run (no bundle)
 ./scripts/bundle.sh                     # release .app + .dmg → dist/
 ./scripts/release.sh minor "desc"       # bump minor, commit, tag, push
 ./scripts/release.sh patch "desc"       # bump patch, commit, tag, push
-pkill McSource                          # stop running instance
-defaults delete com.nielsemmer.mcsource # wipe saved prefs
+pkill McAudio                          # stop running instance
+defaults delete com.nielsemmer.mcaudio # wipe saved prefs
 ```
 
 ## GitHub
 
-- Repo: https://github.com/niels-emmer/mcsource
-- Releases: https://github.com/niels-emmer/mcsource/releases
+- Repo: https://github.com/niels-emmer/McAudio
+- Releases: https://github.com/niels-emmer/McAudio/releases
 
 ## Status
 

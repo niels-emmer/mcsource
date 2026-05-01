@@ -4,7 +4,7 @@ import XCTest
 final class ConfigStoreTests: XCTestCase {
     private var defaults: UserDefaults!
     private var store: ConfigurationStore!
-    private let suiteName = "com.mcsource.tests"
+    private let suiteName = "com.mcaudio.tests"
 
     override func setUp() {
         super.setUp()

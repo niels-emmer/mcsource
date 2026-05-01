@@ -17,7 +17,7 @@ final class PreferencesWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "mcsource \u{2014} Settings"
+        window.title = "McAudio \u{2014} Settings"
         window.center()
         super.init(window: window)
         window.delegate = self
@@ -121,7 +121,7 @@ struct PreferencesView: View {
     private var versionBadge: some View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
         let releaseURL = version != "dev"
-            ? URL(string: "https://github.com/niels-emmer/mcsource/releases/tag/v\(version)")
+            ? URL(string: "https://github.com/niels-emmer/McAudio/releases/tag/v\(version)")
             : nil
         if let url = releaseURL {
             Link("v\(version)", destination: url)

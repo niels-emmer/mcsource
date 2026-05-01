@@ -60,6 +60,6 @@ jobs:
           TAG="${GITHUB_REF#refs/tags/}"
           VERSION="${TAG#v}"
           gh release create "$TAG" \
-            --title "mcsource ${TAG}" \
+            --title "McAudio ${TAG}" \
             --notes-file release-notes.md \
-            "dist/McSource-${VERSION}.dmg#McSource ${VERSION} — macOS arm64"
+            "dist/McAudio-${VERSION}.dmg#McAudio ${VERSION} — macOS arm64"

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="McSource"
+APP_NAME="McAudio"
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$(dirname "$0")/../Info.plist")
-VOLUME_NAME="mcsource ${VERSION}"
+VOLUME_NAME="McAudio ${VERSION}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DIST="$ROOT/dist"
 BUNDLE="$DIST/${APP_NAME}.app"

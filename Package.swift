@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "mcsource",
+    name: "McAudio",
     platforms: [.macOS(.v13)],
     products: [
         .library(name: "AudioCore", targets: ["AudioCore"]),
-        .executable(name: "McSource", targets: ["McSourceApp"]),
+        .executable(name: "McAudio", targets: ["McAudioApp"]),
     ],
     targets: [
         .target(
@@ -15,9 +15,9 @@ let package = Package(
             linkerSettings: [.linkedFramework("CoreAudio")]
         ),
         .executableTarget(
-            name: "McSourceApp",
+            name: "McAudioApp",
             dependencies: ["AudioCore"],
-            path: "Sources/McSourceApp",
+            path: "Sources/McAudioApp",
             linkerSettings: [
                 .linkedFramework("AppKit"),
                 .linkedFramework("CoreAudio"),

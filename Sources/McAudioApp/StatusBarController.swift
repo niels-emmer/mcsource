@@ -105,7 +105,7 @@ final class StatusBarController: NSObject {
 
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(
-            title: "Quit mcsource",
+            title: "Quit McAudio",
             action: #selector(NSApplication.terminate(_:)),
             keyEquivalent: "q"
         ))

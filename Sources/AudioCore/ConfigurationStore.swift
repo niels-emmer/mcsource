@@ -1,10 +1,10 @@
 import Foundation
 
 public final class ConfigurationStore {
-    public static let didChange = Notification.Name("com.mcsource.configurationsDidChange")
+    public static let didChange = Notification.Name("com.mcaudio.configurationsDidChange")
 
     private let defaults: UserDefaults
-    private let storageKey = "com.mcsource.deviceConfigurations"
+    private let storageKey = "com.mcaudio.deviceConfigurations"
 
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
