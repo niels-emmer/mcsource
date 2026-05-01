@@ -21,9 +21,13 @@ The icon in your menu bar reflects your currently active output. Click it to see
 2. Open the DMG — a Finder window opens with the app and an Applications shortcut
 3. Drag **McSource** onto **Applications**
 4. Eject the DMG
-5. Open McSource from Launchpad or Spotlight — the speaker icon appears in your menu bar
+5. Remove the macOS quarantine flag (required for apps not distributed via the App Store):
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/McSource.app
+   ```
+6. Open McSource from Launchpad or Spotlight — the speaker icon appears in your menu bar
 
-> **First launch:** macOS may ask you to confirm opening an app from an identified developer. Click **Open** in the security dialog.
+> **Why step 5?** macOS quarantines apps downloaded from the internet. Because mcsource is not signed with a paid Apple Developer certificate, Gatekeeper will otherwise block it with _"Apple could not verify this app is free of malware"_. The `xattr` command removes the quarantine flag. Alternatively, after the first blocked attempt, go to System Settings → Privacy & Security → scroll down → **Open Anyway**.
 
 To launch automatically at login: open McSource → click the menu bar icon → **Settings…** → enable **Launch at login**.
 
@@ -148,8 +152,12 @@ Settings save to UserDefaults on every interaction. If changes don't persist acr
 defaults read com.nielsemmer.mcsource
 ```
 
-**Gatekeeper blocks the app**  
-The DMG is ad-hoc signed. On first launch, right-click the app and choose **Open**, then confirm in the dialog.
+**"Apple could not verify mcsource is free of malware"**  
+This is expected for apps not distributed via the App Store or signed with a paid Apple Developer certificate. Fix it with one Terminal command after dragging to Applications:
+```bash
+xattr -dr com.apple.quarantine /Applications/McSource.app
+```
+Alternatively: System Settings → Privacy & Security → scroll down → **Open Anyway**.
 
 ---
 
