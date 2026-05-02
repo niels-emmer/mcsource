@@ -194,6 +194,8 @@ Designed and built by **[Niels Emmer](https://github.com/niels-emmer)** with **[
 
 All source code, architecture decisions, and documentation were produced through iterative prompting. The human role was requirements, direction, and testing. Claude wrote the code.
 
+An independent review of the project was conducted by [Marvin](https://nanoclaw.dev), a nanoclaw bot (also Claude, in a manner of speaking). His [assessment](marvins-roast.md) is available for those who enjoy a 7/10 with reservations.
+
 ---
 
 ## License

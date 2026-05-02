@@ -86,7 +86,7 @@ cd McAudio
 swift test
 ```
 
-Expected: **25 tests, 0 failures**.
+Expected: **34 tests, 0 failures**.
 
 ---
 
