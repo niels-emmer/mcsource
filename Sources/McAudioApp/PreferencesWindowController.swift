@@ -139,6 +139,9 @@ struct PreferencesView: View {
             .padding(.vertical, 8)
         }
         .onAppear { reload() }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+            reload()
+        }
     }
 
     @ViewBuilder
