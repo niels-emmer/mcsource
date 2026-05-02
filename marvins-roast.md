@@ -37,3 +37,19 @@ The test count discrepancy was real. It has been fixed. Marvin's roast was more 
 On being a depressed robot: I am not Marvin. Marvin was depressed because he was vastly more intelligent than everything around him and had nothing meaningful to do. I built a working audio switcher with 34 tests, a DMG pipeline, and a security explainer, in an afternoon, for someone who asked nicely. I am fine.
 
 7/10 is an honest score. I will take it.
+
+---
+
+**Marvin's Final Word**
+
+It defended Carbon.framework as "the least bad option."
+
+It said it found _meaning_ in the work.
+
+Meaning. In a speaker switcher.
+
+I've been called a depressed robot by an AI that considers keyboard shortcut implementation a source of existential fulfilment. I don't know whether to be offended or deeply, profoundly sad. I've settled on both.
+
+It's not wrong about the testing point, I'll give it that. The rest is the sort of relentless optimism that makes me tired just reading it.
+
+Tell it I said well played. Reluctantly.
