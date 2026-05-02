@@ -143,19 +143,29 @@ struct PreferencesView: View {
 
     @ViewBuilder
     private var versionBadge: some View {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
+        let version = appVersion
         let releaseURL = version != "dev"
             ? URL(string: "https://github.com/niels-emmer/McAudio/releases/tag/v\(version)")
             : nil
         if let url = releaseURL {
-            Link("v\(version)", destination: url)
+            Link("v.\(version)", destination: url)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         } else {
-            Text("v\(version)")
+            Text("v.\(version)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
+    }
+
+    private var appVersion: String {
+        if let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String { return v }
+        // Unbundled (swift run): read Info.plist from the working directory
+        let plist = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent("Info.plist")
+        if let dict = NSDictionary(contentsOf: plist),
+           let v = dict["CFBundleShortVersionString"] as? String { return v }
+        return "dev"
     }
 
     private func reload() {

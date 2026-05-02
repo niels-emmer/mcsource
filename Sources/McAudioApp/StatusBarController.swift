@@ -56,62 +56,80 @@ final class StatusBarController: NSObject {
 
     private func rebuildMenu() {
         let menu = NSMenu()
-        let configs  = store.loadAll()
-        let devices  = (try? provider.outputDevices()) ?? []
-        let activeUID = (try? provider.defaultOutputDevice())?.uid
+        var allConfigs = store.loadAll()
+        let liveDevices = (try? provider.outputDevices()) ?? []
+        let activeUID   = (try? provider.defaultOutputDevice())?.uid
+        let liveUIDs    = Set(liveDevices.map { $0.uid })
+
+        // Cache the HAL name for every live device so it stays readable when offline
+        var namesChanged = false
+        for device in liveDevices {
+            var cfg = allConfigs[device.uid]
+                ?? DeviceConfiguration(sfSymbol: device.transportType.defaultSFSymbol)
+            if cfg.lastKnownName != device.name {
+                cfg.lastKnownName = device.name
+                allConfigs[device.uid] = cfg
+                namesChanged = true
+            }
+        }
+        if namesChanged { store.save(allConfigs) }
 
         var keyIndex = 1
-        for device in devices {
-            let config = configs[device.uid]
+
+        // Live + enabled devices — selectable
+        for device in liveDevices {
+            let config = allConfigs[device.uid]
             guard config?.isEnabled ?? true else { continue }
 
-            let displayName = config?.customName.isEmpty == false
-                ? config!.customName
-                : device.name
-
+            let displayName = config?.customName.isEmpty == false ? config!.customName : device.name
+            let sym = config?.sfSymbol.isEmpty == false ? config!.sfSymbol : device.transportType.defaultSFSymbol
             let key = keyIndex <= 9 ? "\(keyIndex)" : ""
-            let item = NSMenuItem(
-                title: displayName,
-                action: #selector(switchDevice(_:)),
-                keyEquivalent: key
-            )
+
+            let item = NSMenuItem(title: displayName, action: #selector(switchDevice(_:)), keyEquivalent: key)
             item.keyEquivalentModifierMask = []
             item.target = self
             item.representedObject = device
             if device.uid == activeUID { item.state = .on }
-
-            let sym = config?.sfSymbol.isEmpty == false
-                ? config!.sfSymbol
-                : device.transportType.defaultSFSymbol
-            if let icon = NSImage(systemSymbolName: sym, accessibilityDescription: nil) {
-                item.image = icon
-            }
-
+            if let icon = NSImage(systemSymbolName: sym, accessibilityDescription: nil) { item.image = icon }
             menu.addItem(item)
             keyIndex += 1
         }
 
-        if devices.filter({ configs[$0.uid]?.isEnabled ?? true }).isEmpty {
+        // Configured + enabled but offline devices — visible but greyed out
+        let offlineEntries = allConfigs
+            .filter { $0.value.isEnabled && !liveUIDs.contains($0.key) }
+            .sorted { $0.key < $1.key }
+
+        for (_, config) in offlineEntries {
+            let displayName = config.customName.isEmpty
+                ? (config.lastKnownName.isEmpty ? "Unknown device" : config.lastKnownName)
+                : config.customName
+            let sym = config.sfSymbol.isEmpty ? "speaker.slash" : config.sfSymbol
+            let key = keyIndex <= 9 ? "\(keyIndex)" : ""
+
+            let item = NSMenuItem(title: displayName, action: nil, keyEquivalent: key)
+            item.keyEquivalentModifierMask = []
+            item.isEnabled = false
+            if let icon = NSImage(systemSymbolName: sym, accessibilityDescription: nil) { item.image = icon }
+            menu.addItem(item)
+            keyIndex += 1
+        }
+
+        let hasAnyEnabled = liveDevices.contains { allConfigs[$0.uid]?.isEnabled ?? true }
+            || !offlineEntries.isEmpty
+        if !hasAnyEnabled {
             let empty = NSMenuItem(title: "No outputs configured", action: nil, keyEquivalent: "")
             empty.isEnabled = false
             menu.addItem(empty)
         }
 
         menu.addItem(.separator())
-        let settingsItem = NSMenuItem(
-            title: "Settings\u{2026}",
-            action: #selector(openSettings),
-            keyEquivalent: ","
-        )
+        let settingsItem = NSMenuItem(title: "Settings\u{2026}", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(
-            title: "Quit McAudio",
-            action: #selector(NSApplication.terminate(_:)),
-            keyEquivalent: "q"
-        ))
+        menu.addItem(NSMenuItem(title: "Quit McAudio", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
 
         menu.delegate = self
         statusItem.menu = menu
